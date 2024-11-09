@@ -8,7 +8,8 @@ import { v4 as uuidv4 } from "uuid";
 
 export const processDocument = async (req: Request, res: Response) => {
     if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
+        res.status(400).json({ error: "No file uploaded" });
+        return;
     }
 
     const assetId = uuidv4();
@@ -32,10 +33,10 @@ export const processDocument = async (req: Request, res: Response) => {
         await storeEmbeddings(embeddings, assetId);
 
         console.log("Document processed successfully.");
-        return res.status(200).json({ assetId, message: "Document processed successfully" });
+        res.status(200).json({ assetId, message: "Document processed successfully" });
     } catch (error) {
         console.error("Error processing document:", error);
-        return res.status(500).json({ error: "Failed to process document" });
+        res.status(500).json({ error: "Failed to process document" });
     } finally {
         try {
             await deleteFile(filePath);

@@ -7,7 +7,6 @@ export const startChatSession = async (assetId: string) => {
     await Chat.create({
         chatThreadId,
         assetId,
-        messages: []
     });
     return chatThreadId;
 };
@@ -42,3 +41,8 @@ export const processUserMessage = async (chatThreadId: string, message: string) 
 
     return agentResponse;
 };
+
+
+export const retrieveChat = async (chatThreadId: string) => {
+    return await Chat.findOne({ chatThreadId });
+}
