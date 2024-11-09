@@ -1,60 +1,47 @@
 import { Request, Response } from "express";
 import { deleteFile, extractContent } from "../utils/fileProcessor";
 import path from "path";
-
 import { embedTextChunks } from "../utils/embedTextChunks";
-import { checkIndexExists, createIndex, describeIndexStats, storeEmbeddings } from "../configure/vectordb";
+import { createIndex, storeEmbeddings } from "../configure/vectordb";
 import { chunkTexts } from "../utils/chunkTexts";
-import { v4 as uuidv4 } from "uuid"; // For generating unique IDs
+import { v4 as uuidv4 } from "uuid";
 
 export const processDocument = async (req: Request, res: Response) => {
-    let filePath;
+    if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const assetId = uuidv4();
+    const filePath = req.file.path;
+    const fileExt = path.extname(req.file.originalname).toLowerCase();
+
     try {
-        if (!req.file) {
-            res.status(400).json({ error: "No file uploaded" });
-            return;
-        }
+        console.log("File detected. Processing...");
 
-        console.log('file is there')
-
-        // Generate a unique asset ID for the chat
-        const assetId = uuidv4();
-
-        filePath = req.file.path;
-        const fileExt = path.extname(req.file.originalname).toLowerCase();
-
-        // Read content from file
+        // Read content from the file and extract text based on file extension
         const contentText = await extractContent(filePath, fileExt);
 
-        // divide content into chunks
+        // Split content into manageable chunks
         const textChunks = chunkTexts(contentText);
 
-        // generate embeddings of chunk
+        // Generate embeddings for each text chunk
         const embeddings = await embedTextChunks(textChunks);
 
-        // creating index
-        const indexExists = await checkIndexExists();
-        console.log('Index exists', indexExists)
-        if (!indexExists) {
-            await createIndex();
-        } else {
-            const indexStats = await describeIndexStats()
-            console.log('Index stats', indexStats)
-        }
-
-        // store embeddings in vector db
+        // Create index if not already created, then store embeddings
+        await createIndex();
         await storeEmbeddings(embeddings, assetId);
 
-
-        res.status(200).json({ success: "success" });
-
-        // Respond with asset ID
-        res.status(200).json({ assetId, message: "Document processed succesfully" });
+        console.log("Document processed successfully.");
+        return res.status(200).json({ assetId, message: "Document processed successfully" });
     } catch (error) {
         console.error("Error processing document:", error);
-        res.status(500).json({ error: "Failed to process document" });
+        return res.status(500).json({ error: "Failed to process document" });
     } finally {
-        await deleteFile(filePath as string);
+        try {
+            await deleteFile(filePath);
+            console.log("Temporary file deleted.");
+        } catch (cleanupError) {
+            console.error("Error deleting file:", cleanupError);
+        }
     }
 };
-

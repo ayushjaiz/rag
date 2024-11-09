@@ -1,82 +1,117 @@
 import { Pinecone } from '@pinecone-database/pinecone';
-
 import { EmbeddingsData, embedTextChunks } from '../utils/embedTextChunks';
 
-const DB_INDEX = 'rag-langchain-nodejs'
+const DB_INDEX = 'rag-langchain-nodejs';
+const EMBEDDING_DIMENSION = 768; // Match the embedding model dimension
 
 const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY as string });
 
 /**
- * 
- * @param {*} embeddings Array of embedding & chunk: [{embedding: [], chunk: ''}]
- * @param {*} namespace 
+ * Stores an array of embeddings in Pinecone under a specified namespace.
+ * @param embeddings Array of embedding objects containing embeddings and chunks
+ * @param namespace Unique identifier for the storage namespace
  */
 async function storeEmbeddings(embeddings: EmbeddingsData[], namespace: string) {
-    console.log('storing emdeddings in vector db...');
-    const index = pc.index(DB_INDEX);
+    try {
+        console.log('Storing embeddings in vector database...');
 
-    for (let i = 0; i < embeddings.length; i++) {
-        await index.namespace(namespace).upsert([{
+        const index = pc.index(DB_INDEX);
+        const vectors = embeddings.map((embedding, i) => ({
             id: `chunk-${i}`,
-            values: embeddings[i].embedding,
-            metadata: { chunk: embeddings[i].chunk }
-        }]);
-    }
+            values: embedding.embedding,
+            metadata: { chunk: embedding.chunk },
+        }));
 
-    console.log('Embedddings sucessfully stored..')
+        await index.namespace(namespace).upsert(vectors);
+        console.log('Embeddings successfully stored.');
+    } catch (error) {
+        console.error('Error storing embeddings:', error);
+        throw new Error('Failed to store embeddings.');
+    }
 }
 
+/**
+ * Creates a Pinecone index if it does not already exist.
+ */
 const createIndex = async () => {
-    await pc.createIndex({
-        name: DB_INDEX,
-
-        // should match embedding model name 786 for genai
-        dimension: 768,
-        metric: 'cosine',
-        spec: {
-            serverless: {
-                cloud: 'aws',
-                region: 'us-east-1'
-            }
+    try {
+        const indexExists = await checkIndexExists();
+        if (indexExists) {
+            console.log("Index already exists:", DB_INDEX);
+            return;
         }
-    });
-    console.log('Index created', DB_INDEX)
-}
 
-async function checkIndexExists() {
-    // List all indexes
-    const response = await pc.listIndexes();
-    const indexes = response.indexes;
-
-    if (!indexes) {
-        return true;
+        await pc.createIndex({
+            name: DB_INDEX,
+            dimension: EMBEDDING_DIMENSION,
+            metric: "cosine",
+            spec: {
+                serverless: {
+                    cloud: "aws",
+                    region: "us-east-1",
+                },
+            },
+        });
+        console.log("Index created:", DB_INDEX);
+    } catch (error) {
+        console.error('Error creating index:', error);
+        throw new Error('Failed to create index.');
     }
+};
 
-    // Check if the desired index is in the list
-    return indexes.find(item => item.name === DB_INDEX);
+/**
+ * Checks if the specified Pinecone index exists.
+ * @returns True if the index exists, false otherwise
+ */
+async function checkIndexExists(): Promise<boolean> {
+    try {
+        const response = await pc.listIndexes();
+        const indexes = response.indexes || [];
+        return indexes.some((item) => item.name === DB_INDEX);
+    } catch (error) {
+        console.error('Error checking index existence:', error);
+        throw new Error('Failed to check index existence.');
+    }
 }
 
+/**
+ * Retrieves Pinecone index statistics.
+ * @returns Statistics of the specified index
+ */
 const describeIndexStats = async () => {
-    const index = pc.index(DB_INDEX);
-    const stats = await index.describeIndexStats();
-    return stats;
-}
+    try {
+        const index = pc.index(DB_INDEX);
+        return await index.describeIndexStats();
+    } catch (error) {
+        console.error('Error describing index stats:', error);
+        throw new Error('Failed to retrieve index stats.');
+    }
+};
 
-// https://docs.pinecone.io/guides/data/query-data
+/**
+ * Retrieves relevant document chunks from Pinecone based on a query.
+ * @param query The query string to embed and search with
+ * @param namespace Namespace under which to search
+ * @returns Array of relevant chunks
+ */
 async function retrieveRelevantChunks(query: string, namespace: string) {
-    const embeddingDataArr = await embedTextChunks([query]);
-    const index = pc.index(DB_INDEX);
-    const results = await index.namespace(namespace).query({
-        vector: embeddingDataArr[0].embedding,
-        topK: 2,
-        includeValues: true,
-        includeMetadata: true,
-    });
-    return results.matches.map(match => match.metadata?.chunk);
-}
+    try {
+        const [embeddingData] = await embedTextChunks([query]);
+        const index = pc.index(DB_INDEX);
+        
+        const results = await index.namespace(namespace).query({
+            vector: embeddingData.embedding,
+            topK: 3,
+            includeValues: true,
+            includeMetadata: true,
+        });
 
-// Storing embeddings in Pinecone
-//await storeEmbeddings(embeddings, 'your-namespace');
+        return results.matches.map((match) => match.metadata?.chunk);
+    } catch (error) {
+        console.error('Error retrieving relevant chunks:', error);
+        throw new Error('Failed to retrieve relevant chunks.');
+    }
+}
 
 export {
     storeEmbeddings,
@@ -84,4 +119,4 @@ export {
     describeIndexStats,
     retrieveRelevantChunks,
     checkIndexExists
-}
+};
