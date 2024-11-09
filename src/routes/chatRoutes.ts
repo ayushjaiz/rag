@@ -5,6 +5,6 @@ const router = Router();
 
 router.post("/start", startChat);
 router.post("/message", sendMessage);
-router.post("/history", chatHistory);
+router.get("/history", chatHistory);
 
 export default router;          

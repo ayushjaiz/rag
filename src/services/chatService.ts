@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Chat } from "../models/chat";
+import { Chat, MessageRole } from "../models/chat";
 import { generateAgentResponse } from "../utils/generateAgentResponse";
 
 export const startChatSession = async (assetId: string) => {
@@ -31,8 +31,8 @@ export const processUserMessage = async (chatThreadId: string, message: string) 
         {
             $push: {
                 messages: [
-                    { timeString, by: "user", message },
-                    { timeString: new Date().toISOString(), by: "agent", message: agentResponse }
+                    { timeString, role: MessageRole.USER, message },
+                    { timeString: new Date().toISOString(), role: MessageRole.AGENT, message: agentResponse }
                 ]
             }
         },
