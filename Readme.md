@@ -14,8 +14,10 @@ accurate information retrieval later on. The backend uses MongoDB for data stora
 - [Setup and Installation](#setup-and-installation)
 - [Environment Variables](#environment-variables)
 - [API Endpoints and Sample Requests](#api-endpoints-and-sample-requests)
-- [Development Choices](###development-choices)
-- [Acknowledgements](###acknowledgements)
+- [Development Choices](#development-choices)
+- [Deployment](#deployment)
+- [Potential Improvements](#potential-improvements)
+- [Acknowledgements](#acknowledgements)
 
 ---
 
@@ -233,7 +235,7 @@ POST /api/chat/history
 - Type security
 - Faster code development
 
-### Why MongoDB?
+## Why MongoDB?
 
 - Flexible schema for review data
 - Easy to scale
@@ -243,6 +245,15 @@ POST /api/chat/history
 
 - Easy documentation
 - Free tier avaliable on Pinecone Console
+
+## Deployment
+
+This app is deployed on render: https://rag-chatbot-0fjv.onrender.com
+
+## Potential Improvements
+
+- Divide backend into microservices
+- Uploading files to Cloudinary/S3
 
 ## Acknowledgements
 
