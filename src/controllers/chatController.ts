@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { startChatSession, processUserMessage, retrieveChat } from "../services/chatService";
+import { startChatSession, retrieveChat } from "../services/chatService";
+import { EventEmitter } from 'events';
+import { Chat } from "../models/chat";
+import { generateAgentResponse } from "../utils/generateAgentResponse";
 
 export const startChat = async (req: Request, res: Response) => {
     const { assetId } = req.body;
@@ -26,14 +29,62 @@ export const sendMessage = async (req: Request, res: Response) => {
         return;
     }
 
+    // Setup SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const responseStream = new EventEmitter();
+    let agentResponseContent = ""; // Accumulate the full agent response
+
+    // Send data to the client as chunks arrive
+    responseStream.on('data', (chunk) => {
+        res.write(`data: ${chunk.content}\n\n`);
+        console.log(chunk.content);
+        agentResponseContent += chunk.content;
+    });
+
+    // End the response when streaming is done
+    responseStream.on('end', async () => {
+        res.end();
+
+        // console.log(agentResponseContent);
+        try {
+            await Chat.findOneAndUpdate(
+                { chatThreadId },
+                {
+                    $push: {
+                        messages: [
+                            { timeString: new Date().toISOString(), role: 'USER', message },
+                            { timeString: new Date().toISOString(), role: 'AGENT', message: agentResponseContent }
+                        ]
+                    }
+                },
+                { new: true }
+            );
+            console.log("Messages successfully stored in database.");
+        } catch (error) {
+            console.error("Error storing messages in database:", error);
+        }
+    });
+
+    // Handle errors in the streaming process
+    responseStream.on('error', (error) => {
+        res.write(`data: ${JSON.stringify({ error })}\n\n`);
+        res.end();
+    });
+
     try {
-        const agentResponse = await processUserMessage(chatThreadId, message);
-        res.status(200).json({ response: agentResponse });
+        const chat = await Chat.findOne({ chatThreadId });
+        if (!chat) throw new Error("Chat thread not found");
+
+        const agentResponse = await generateAgentResponse(chat.assetId, message, responseStream);
     } catch (error) {
         console.error("Error processing user message:", error);
-        res.status(500).json({ error: "Failed to process user message" });
+        responseStream.emit('error', "Failed to process user message.");
     }
 };
+
 
 export const chatHistory = async (req: Request, res: Response) => {
     const { chatThreadId } = req.body;
@@ -51,3 +102,67 @@ export const chatHistory = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to retrieve chat history" });
     }
 };
+
+// export const sendMessage = async (req: Request, res: Response) => {
+//     const { chatThreadId, message } = req.body;
+
+//     if (!chatThreadId || !message) {
+//         res.status(400).json({ error: "Chat thread ID and message are required" });
+//         return;
+//     }
+
+//     // Setup SSE headers
+//     res.setHeader('Content-Type', 'text/event-stream');
+//     res.setHeader('Cache-Control', 'no-cache');
+//     res.setHeader('Connection', 'keep-alive');
+
+//     // Create an EventEmitter instance to manage the response stream
+//     const responseStream = new EventEmitter();
+//     let agentResponseContent = ""; // To accumulate the full agent response
+
+//     // Send data to the client as chunks arrive
+//     responseStream.on('data', (chunk) => {
+//         res.write(`data: ${chunk}\n\n`);
+//         agentResponseContent += chunk; // Append each chunk to the agent's response
+//     });
+
+//     // End the response when streaming is done
+//     responseStream.on('end', async () => {
+//         res.end();
+//         // Store the message in the database after streaming completes
+//         try {
+//             await Chat.findOneAndUpdate(
+//                 { chatThreadId },
+//                 {
+//                     $push: {
+//                         messages: [
+//                             { timeString: new Date().toISOString(), role: 'USER', message },
+//                             { timeString: new Date().toISOString(), role: 'AGENT', message: agentResponseContent }
+//                         ]
+//                     }
+//                 },
+//                 { new: true }
+//             );
+//             console.log("Messages successfully stored in database.");
+//         } catch (error) {
+//             console.error("Error storing messages in database:", error);
+//         }
+//     });
+
+//     // Handle errors in the streaming process
+//     responseStream.on('error', (error) => {
+//         res.write(`data: ${JSON.stringify({ error })}\n\n`);
+//         res.end();
+//     });
+
+//     try {
+//         // Retrieve the chat document to get the assetId
+//         const chat = await Chat.findOne({ chatThreadId });
+//         if (!chat) throw new Error("Chat thread not found");
+
+//         const agentResponse = await generateAgentResponse(chat.assetId, message);
+//     } catch (error) {
+//         console.error("Error processing user message:", error);
+//         res.status(500).json({ error: "Failed to process user message" });
+//     }
+// };
