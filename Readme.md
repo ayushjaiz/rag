@@ -62,7 +62,7 @@ accurate information retrieval later on. The backend uses MongoDB for data stora
 - Pinecone
 - Git (for version control)
 
-## Environment Variables
+### Environment Variables
 
 - Create a `.env` file in the backend directory and copy the content from `.env.example` into it.
 - Get Pinecone DB api from https://app.pinecone.io
@@ -85,6 +85,8 @@ accurate information retrieval later on. The backend uses MongoDB for data stora
    npm run build
    npm run start
    ```
+
+---
 
 ## API Endpoints and Sample Requests
 
@@ -186,8 +188,7 @@ POST /api/chat/history
 
 ```json
 {
-  "email": "dixit@gmail.com",
-  "password": "dixit"
+  "chatThreadId": "711d353e-dece-496a-b8b6-3567205db03c"
 }
 ```
 
@@ -229,31 +230,37 @@ POST /api/chat/history
 - Strong async/await support
 - Easy deployment options
 
-## Why Typescript?
+### Why Typescript?
 
 - Prevent from errors during development phase
 - Type security
 - Faster code development
 
-## Why MongoDB?
+### Why MongoDB?
 
 - Flexible schema for review data
 - Easy to scale
 - Free tier available on MongoDB Atlas
 
-## Why Pinecone?
+### Why Pinecone?
 
 - Easy documentation
 - Free tier avaliable on Pinecone Console
+
+---
 
 ## Deployment
 
 This app is deployed on render: https://rag-chatbot-0fjv.onrender.com
 
+---
+
 ## Potential Improvements
 
 - Divide backend into microservices
 - Uploading files to Cloudinary/S3
+
+---
 
 ## Acknowledgements
 
