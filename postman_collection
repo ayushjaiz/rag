@@ -1,0 +1,153 @@
+{
+	"info": {
+		"_postman_id": "6c8c6cf0-14b1-40e0-bf85-8f1d0f7aa71b",
+		"name": "Pdf chat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25067591"
+	},
+	"item": [
+		{
+			"name": "startChat",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "assetId",
+							"value": "a5be4bc1-544c-4f08-b6c3-a546e882e2d4",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/chat/start",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"chat",
+						"start"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "messageInChat",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "message",
+							"value": "Where is my college?",
+							"type": "text"
+						},
+						{
+							"key": "chatThreadId",
+							"value": "711d353e-dece-496a-b8b6-3567205db03c",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/chat/message",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"chat",
+						"message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "chatHistory",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "chatThreadId",
+							"value": "d525fbbc-801d-43c8-a502-335634a0c6a3",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/chat/history",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"chat",
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "streamMessage",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"chatThreadId\": \"d525fbbc-801d-43c8-a502-335634a0c6a3\", \"message\": \"What is a database?\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/chat/message",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"chat",
+						"message"
+					]
+				},
+				"description": "Generated from cURL: curl -N -H \"Content-Type: application/json\" -X POST -d '{\"chatThreadId\": \"711d353e-dece-496a-b8b6-3567205db03c\", \"message\": \"Tell about me\"}' http://localhost:3000/api/chat/message\r\n"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:3000"
+		}
+	]
+}

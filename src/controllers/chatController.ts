@@ -29,11 +29,6 @@ export const sendMessage = async (req: Request, res: Response) => {
         return;
     }
 
-    // Setup SSE headers
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
     const responseStream = new EventEmitter();
     let agentResponseContent = ""; // Accumulate the full agent response
 
@@ -79,6 +74,7 @@ export const sendMessage = async (req: Request, res: Response) => {
         if (!chat) throw new Error("Chat thread not found");
 
         const agentResponse = await generateAgentResponse(chat.assetId, message, responseStream);
+        return;
     } catch (error) {
         console.error("Error processing user message:", error);
         responseStream.emit('error', "Failed to process user message.");
