@@ -90,14 +90,14 @@ accurate information retrieval later on. The backend uses MongoDB for data stora
 
 ## API Endpoints and Sample Requests
 
-### POST `/api/document/process`
+### POST `/api/documents/process`
 
 Process document and store embeddings in database
 
 #### Request:
 
 ```http
-POST /api/document/process
+POST /api/documents/process
 ```
 
 #### Body
@@ -110,8 +110,8 @@ file: [Upload your text-based file here]
 
 ```json
 {
-  "assetId": "61100986-9ee3-49c7-89fb-fc9cbb9c8e16",
-  "message": "Document processed successfully"
+    "assetId": "850bae1c-ef2f-48e7-af53-dcc67c086247",
+    "message": "Document processed successfully"
 }
 ```
 
@@ -129,7 +129,7 @@ POST /api/chat/start
 
 ```json
 {
-  "assetId": "61100986-9ee3-49c7-89fb-fc9cbb9c8e16"
+  "assetId": "850bae1c-ef2f-48e7-af53-dcc67c086247"
 }
 ```
 
@@ -137,7 +137,7 @@ POST /api/chat/start
 
 ```json
 {
-  "chatThreadId": "711d353e-dece-496a-b8b6-3567205db03c"
+    "chatThreadId": "84578f88-30ce-4454-a0ef-ff3973788cae"
 }
 ```
 
@@ -155,26 +155,22 @@ POST /api/chat/message
 
 ```json
 {
-  "chatThreadId": "711d353e-dece-496a-b8b6-3567205db03c",
-  "message": "Where do I live?"
+    "chatThreadId": "84578f88-30ce-4454-a0ef-ff3973788cae",
+    "message": "What is SQL?"
 }
 ```
 
 #### Response(Stream):
 
-```json
-{
-  "data": "I live in"
-}
+```
+data: SQL stands for Structured Query Language, and it is used to communicate with the Database
 ```
 
-```json
-{
-  "data": "Noida"
-}
+```
+data: . This is a standard language used to perform tasks such as retrieval, updates, insertion and deletion of data from a database.
 ```
 
-### GET `/history`
+### GET `/chat/history`
 
 Access chat history via chatThreadId
 
@@ -188,7 +184,7 @@ POST /api/chat/history
 
 ```json
 {
-  "chatThreadId": "711d353e-dece-496a-b8b6-3567205db03c"
+  "chatThreadId": "84578f88-30ce-4454-a0ef-ff3973788cae"
 }
 ```
 
@@ -197,25 +193,25 @@ POST /api/chat/history
 ```json
 {
   "chatHistory": {
-    "_id": "672f53b67f04ba64e634b82c",
-    "chatThreadId": "711d353e-dece-496a-b8b6-3567205db03c",
-    "assetId": "61100986-9ee3-49c7-89fb-fc9cbb9c8e16",
-    "startedAt": "2024-11-09T12:21:10.387Z",
-    "messages": [
-      {
-        "timeString": "2024-11-09T12:21:44.862Z",
-        "role": "user",
-        "message": "Where is my college?",
-        "_id": "672f53dc7f04ba64e634b830"
-      },
-      {
-        "timeString": "2024-11-09T12:21:48.493Z",
-        "role": "agent",
-        "message": "Noida",
-        "_id": "672f53dc7f04ba64e634b831"
-      }
-    ],
-    "__v": 0
+      "_id": "67307da4bc6d8095c8643e7b",
+      "chatThreadId": "84578f88-30ce-4454-a0ef-ff3973788cae",
+      "assetId": "850bae1c-ef2f-48e7-af53-dcc67c086247",
+      "startedAt": "2024-11-10T09:32:20.564Z",
+      "messages": [
+          {
+              "timeString": "2024-11-10T09:33:47.966Z",
+              "role": "USER",
+              "message": "What is SQL?",
+              "_id": "67307dfbbc6d8095c8643e7f"
+          },
+          {
+              "timeString": "2024-11-10T09:33:47.966Z",
+              "role": "AGENT",
+              "message": "SQL stands for Structured Query Language, and it is used to communicate with the Database. This is a standard language used to perform tasks such as retrieval, updates, insertion and deletion of data from a database.",
+              "_id": "67307dfbbc6d8095c8643e80"
+          }
+      ],
+      "__v": 0
   }
 }
 ```

@@ -38,42 +38,6 @@
 			"response": []
 		},
 		{
-			"name": "messageInChat",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "message",
-							"value": "Where is my college?",
-							"type": "text"
-						},
-						{
-							"key": "chatThreadId",
-							"value": "711d353e-dece-496a-b8b6-3567205db03c",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "http://localhost:3000/api/chat/message",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"chat",
-						"message"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "chatHistory",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -108,7 +72,38 @@
 			"response": []
 		},
 		{
-			"name": "streamMessage",
+			"name": "process document",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Ayush/Downloads/Documents/SQL Interview Questions and Answers .pdf"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/documents/process",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"documents",
+						"process"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "chatMessage",
 			"request": {
 				"method": "POST",
 				"header": [
