@@ -16,7 +16,7 @@
 					"urlencoded": [
 						{
 							"key": "assetId",
-							"value": "a5be4bc1-544c-4f08-b6c3-a546e882e2d4",
+							"value": "850bae1c-ef2f-48e7-af53-dcc67c086247",
 							"type": "text"
 						}
 					]
@@ -50,7 +50,7 @@
 					"urlencoded": [
 						{
 							"key": "chatThreadId",
-							"value": "d525fbbc-801d-43c8-a502-335634a0c6a3",
+							"value": "84578f88-30ce-4454-a0ef-ff3973788cae",
 							"type": "text"
 						}
 					]
@@ -72,6 +72,35 @@
 			"response": []
 		},
 		{
+			"name": "health check",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "chatThreadId",
+							"value": "d525fbbc-801d-43c8-a502-335634a0c6a3",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000"
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "process document",
 			"request": {
 				"method": "POST",
@@ -87,12 +116,13 @@
 					]
 				},
 				"url": {
-					"raw": "http://localhost:3000/api/documents/process",
-					"protocol": "http",
+					"raw": "https://rag-chatbot-0fjv.onrender.com/api/documents/process",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"rag-chatbot-0fjv",
+						"onrender",
+						"com"
 					],
-					"port": "3000",
 					"path": [
 						"api",
 						"documents",
@@ -114,7 +144,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"chatThreadId\": \"d525fbbc-801d-43c8-a502-335634a0c6a3\", \"message\": \"What is a database?\"}",
+					"raw": "{\r\n    \"chatThreadId\": \"84578f88-30ce-4454-a0ef-ff3973788cae\",\r\n    \"message\": \"What is SQL?\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
